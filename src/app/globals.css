@@ -3,9 +3,19 @@
 @tailwind utilities;
 
 body {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+}
+
+.container {
+  max-width: 1280px;
+  height: 100vh;
   color: #000000;
   background-color: #e6e6e6;
+  padding-bottom: 32px;
 }
+
 .header {
   color: #ffffff;
   background-color: #202854;
@@ -98,6 +108,7 @@ body {
   margin: 8px 0;
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
   align-items: stretch;
   justify-content: center;
   text-align: center;

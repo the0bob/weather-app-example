@@ -15,6 +15,18 @@ function getIcon(shortForecast: string) {
   return '/Sun.svg';
 }
 
+// https://www.w3resource.com/javascript-exercises/fundamental/javascript-fundamental-exercise-122.php
+const toOrdinalSuffix = (num: string) => {
+  const int = parseInt(num),
+    digits = [int % 10, int % 100],
+    ordinals = ['st', 'nd', 'rd', 'th'],
+    oPattern = [1, 2, 3, 4],
+    tPattern = [11, 12, 13, 14, 15, 16, 17, 18, 19];
+  return oPattern.includes(digits[0]) && !tPattern.includes(digits[1])
+    ? ordinals[digits[0] - 1]
+    : ordinals[3];
+};
+
 async function getData(searchText: string) {
   if (!searchText || searchText.length < 3) return;
 
@@ -68,12 +80,12 @@ export default function Home() {
   const today = searchResultData?.forecast?.periods[0];
   const iconPath = getIcon(today?.shortForecast)
   const dailyForecast = searchResultData?.forecast?.periods.filter((item: any) => {
-    // TODO: use a better filter
-    return item?.number % 2 === 0;
+    // remove the night forecasts as they aren't in the mock up
+    return !item?.name.includes('ight');
   }).slice(-6);
 
   return (
-    <main className="container-fluid">
+    <main className="container">
       <div className="header">
         <div className="header-label">
           My Weather
@@ -115,10 +127,12 @@ export default function Home() {
           {dailyForecast?.map((item: any) => {
             const icon = getIcon(item?.shortForecast);
             const dateObj = item?.startTime && new Date(item?.startTime);
-            const date = dateObj && `${DAYS[dateObj.getDay(dateObj)]}`;
+            const dayOfWeek = dateObj && `${DAYS[dateObj.getDay(dateObj)]}`;
+            const dayOfMonth = dateObj && `${dateObj.getDate(dateObj)}`;
+            const ordinal = dateObj && `${toOrdinalSuffix(dayOfMonth)}`;
             return (
               <div key={item.number} className="daily-forecast-item">
-                {date}
+                {dayOfWeek} {dayOfMonth}<small>{ordinal}</small>
                 {icon && <Image
                   className="daily-forecast-icon"
                   src={icon}
