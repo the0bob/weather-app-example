@@ -91,7 +91,7 @@ export default function Home() {
           My Weather
         </div>
         <div className="search-wrapper">
-          <input className="search-input" value={searchText} onChange={handleSearchInput} type="text" placeholder="Enter Zipcode, City, or State" />
+          <input className="search-input" value={searchText} onChange={handleSearchInput} type="text" placeholder="Enter Zipcode" />
         </div>
       </div>
       <div className={loading ? 'content' : 'hidden'}> 
