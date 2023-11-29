@@ -2,26 +2,123 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  color: #000000;
+  background-color: #e6e6e6;
+}
+.header {
+  color: #ffffff;
+  background-color: #202854;
+  display: flex;
+}
+
+.header-label {
+  font-size: 34px;
+  font-weight: 250;
+  padding: 4px 30px;
+}
+
+.search-wrapper {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 12px 8px;
+}
+
+.search-input {
+  line-height: 33px;
+  vertical-align: middle;
+  color: #000000;
+  font-size: small;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 200;
+  padding: 4px 14px;
+  width: 240px;
+}
+
+.content {
+  width: 100%;
+  padding: 24px;
+  display: flex;
+  /* align-items: center; */
+  justify-content: center;
+  text-align: center;
+}
+
+.icon-wrapper {
+  margin-top: 12px;
+  margin-right: -64px;
+}
+
+.current-wrapper {
+  max-width: 600px;
+}
+
+.location {
+  text-transform: uppercase;
+  letter-spacing: 6px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.temp {
+  font-size: 100px;
+  font-weight: 700;
+  line-height: 115px;
+}
+
+.short-forecast {
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 40px;
+}
+
+.update-time {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 300;
+}
+
+.detail-forecast {
+  max-width: 100%;
+  margin: 30px 0 0 0;
+  font-size: 16px;
+  font-weight: 300;
+}
+
+.daily-forecast-label {
+  margin: 0px 32px;
+  font-size: 20px;
+  font-weight: 500;
+  display: flex;
+  align-items: stretch;
+}
+
+.daily-forecast-content {
+  margin: 8px 0;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  text-align: center;
+}
+
+.daily-forecast-item {
+  background-color: #ffffff;
+  border: solid 1px #cccccc;
+  border-radius: 16px;
+  flex: 0 0 198px;
+  padding: 24px;
+  margin: 6px;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.daily-forecast-icon {
+  display: inline;
+}
+
+.daily-forecast-temp {
+  font-size: 50px;
+  font-weight: 500;
 }
