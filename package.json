@@ -5,11 +5,11 @@
   "scripts": {
     "develop": "next dev",
     "dev": "next dev",
-    "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "build": "next build && touch ./dist/.nojekyll && echo weather.bobpalmer.info > ./dist/CNAME",
     "predeploy": "npm run build",
-    "deploy": "echo weather.bobpalmer.info > ./.next/CNAME && gh-pages -d .next"
+    "deploy": "gh-pages -d dist -t true"
   },
   "dependencies": {
     "gh-pages": "^6.1.0",
