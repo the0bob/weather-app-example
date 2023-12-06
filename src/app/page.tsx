@@ -79,12 +79,8 @@ export default function Home() {
   const timeObj = searchResultData?.forecast?.updateTime && new Date(searchResultData?.forecast?.updateTime);
   const time = timeObj && `updated ${timeObj.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
   const today = searchResultData?.forecast?.periods[0];
-  const dailyForecast = searchResultData?.forecast?.periods
+  const dailyForecast = searchResultData?.forecast?.periods.slice(1);
   // TODO: group day and night forecasts
-  // .filter((item: any) => {
-  //   // remove the night forecasts as they aren't in the mock up
-  //   return !item?.name.includes('ight');
-  // }).slice(-6);
 
   return (
     <main className="container">
