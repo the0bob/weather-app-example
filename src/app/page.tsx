@@ -1,19 +1,8 @@
 'use client';
 import Image from 'next/image'
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import debounce from 'lodash.debounce';
-
-const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-function getIcon(shortForecast: string) {
-  if (!shortForecast) return;
-  if (shortForecast.includes('Freezing')) return '/Freezing.svg';
-  if (shortForecast.includes('Sunny') && shortForecast.includes('Rain')) return '/Blah.svg';
-  if (shortForecast.includes('Cloudy')) return '/Blah.svg';
-  if (shortForecast.includes('Rain')) return '/Typhoon.svg';
-  if (shortForecast.includes('Hot')) return '/Hell.svg';
-  return '/Sun.svg';
-}
+import constants from './constants.json';
 
 // https://www.w3resource.com/javascript-exercises/fundamental/javascript-fundamental-exercise-122.php
 const toOrdinalSuffix = (num: string) => {
@@ -28,25 +17,27 @@ const toOrdinalSuffix = (num: string) => {
 };
 
 async function getData(searchText: string) {
-  if (!searchText || searchText.length < 3) return;
+  if (!searchText || searchText.length < 2) return;
+  const errmsg = 'Forecast for Location not Found';
 
-  const geocodeResponse = await fetch(`https://geocode.xyz/${searchText}?json=1`);
+  // TODO: parse state codes into state names or do seperate zip code lookup
+  const geocodeResponse = await fetch(`https://geocode.xyz/${encodeURIComponent(searchText)}?region='US'&json=1`);
   const {latt, longt } = await geocodeResponse.json();
-  if (isNaN(latt) || isNaN(longt)) return;
+  if (isNaN(latt) || isNaN(longt)) return { error: errmsg };
 
   const gridpointResponse = await fetch(`https://api.weather.gov/points/${latt},${longt}`);
   const parsedGridpointResponse = await gridpointResponse.json();
-  if (!parsedGridpointResponse?.properties) return;
+  if (!parsedGridpointResponse?.properties) return { error: errmsg };
 
   const { properties: { forecast: forcastEndpoint, relativeLocation: { properties: location } } } = parsedGridpointResponse;
-  if (!forcastEndpoint) return;
+  if (!forcastEndpoint) return { error: errmsg };
 
   const forecastResponse = await fetch(forcastEndpoint);
   const parsedForecastResponse = await forecastResponse.json();
-  if (!parsedForecastResponse) return;
+  if (!parsedForecastResponse) return { error: errmsg };
 
   const { properties: forecast } = parsedForecastResponse;
-  if (!forecast) return;
+  if (!forecast) return { error: errmsg };
 
   return { forecast, location } as any;
 }
@@ -55,6 +46,7 @@ export default function Home() {
   let timeout: NodeJS.Timeout;
   let signal: AbortSignal;
   const [searchText, setSearchText] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [searchResultData, setSearchResultData]: any = useState(null);
 
@@ -62,13 +54,22 @@ export default function Home() {
   const updateData = useCallback(debounce(async (incSearchText: string) => {
     setLoading(true);
     const data = await getData(incSearchText);
-    if (data) {
+    if (data?.error) {
+      setErrorMsg(data.error);
+    } else if (data) {
+      setErrorMsg('');
       setSearchResultData(data);
     }
     setLoading(false);
   // throttle this request to allow for full use rinput and avoid hitting api limits
   }, 1200), []);
 
+  useEffect(() => {
+    const defaultSearchText = '66044';
+    setSearchText(defaultSearchText),
+    updateData(defaultSearchText);
+  }, [updateData]);
+  
   async function handleSearchInput(e: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(e.target.value);
     updateData(e.target.value);
@@ -78,30 +79,35 @@ export default function Home() {
   const timeObj = searchResultData?.forecast?.updateTime && new Date(searchResultData?.forecast?.updateTime);
   const time = timeObj && `updated ${timeObj.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
   const today = searchResultData?.forecast?.periods[0];
-  const iconPath = getIcon(today?.shortForecast)
-  const dailyForecast = searchResultData?.forecast?.periods.filter((item: any) => {
-    // remove the night forecasts as they aren't in the mock up
-    return !item?.name.includes('ight');
-  }).slice(-6);
+  const dailyForecast = searchResultData?.forecast?.periods
+  // TODO: group day and night forecasts
+  // .filter((item: any) => {
+  //   // remove the night forecasts as they aren't in the mock up
+  //   return !item?.name.includes('ight');
+  // }).slice(-6);
 
   return (
     <main className="container">
       <div className="header">
         <div className="header-label">
-          My Weather
+          US Weather
         </div>
-        <div className="search-wrapper">
-          <input className="search-input" value={searchText} onChange={handleSearchInput} type="text" placeholder="Enter Zipcode" />
+        <div className="control-wrapper">
+          <input className="control" value={searchText} onChange={handleSearchInput} type="text" placeholder="Enter Zipcode, City, or State" />
         </div>
       </div>
       <div className={loading ? 'content' : 'hidden'}> 
         Loading...
       </div>
-      <div className={!today || loading ? 'hidden' : ''}>
+      <div role="alert" className={!errorMsg || loading ? 'hidden' : 'relative block w-full p-4 mb-4 text-base leading-5 text-white bg-red-500 font-regular'}>
+        {errorMsg}
+      </div>
+      <div className={!today || loading || errorMsg ? 'hidden' : ''}>
         <div className="content">
           <div className="icon-wrapper">
-            {iconPath && <Image
-              src={iconPath}
+            {today?.icon && <Image
+              className="rounded-full"
+              src={today?.icon}
               alt={today?.shortForecast}
               width={180}
               height={180}
@@ -113,29 +119,30 @@ export default function Home() {
             <div className="temp">{`${today?.temperature}`}&deg;</div>
             <div className="short-forecast">{today?.shortForecast}</div>
             <div className="update-time">{time}</div>
-            <div className="detail-forecast">{today?.detailedForecast}</div>
           </div>
           {/* <div>
             <div>{tonight}</div>
           </div>
           <pre>{JSON.stringify(dailyForecast, null, 2)}</pre> */}
         </div>
+        <div className="detail-forecast">{today?.detailedForecast}</div>
+        <hr/>
         <div className="daily-forecast-label"> 
-          Daily Forecast
+          Extended Forecast
         </div>
         <div className="daily-forecast-content"> 
           {dailyForecast?.map((item: any) => {
-            const icon = getIcon(item?.shortForecast);
             const dateObj = item?.startTime && new Date(item?.startTime);
-            const dayOfWeek = dateObj && `${DAYS[dateObj.getDay(dateObj)]}`;
+            const dayOfWeek = dateObj && `${constants.days[dateObj.getDay(dateObj)]}`;
             const dayOfMonth = dateObj && `${dateObj.getDate(dateObj)}`;
             const ordinal = dateObj && `${toOrdinalSuffix(dayOfMonth)}`;
             return (
               <div key={item.number} className="daily-forecast-item">
-                {dayOfWeek} {dayOfMonth}<small>{ordinal}</small>
-                {icon && <Image
+                {/* {dayOfWeek} {dayOfMonth}<small>{ordinal}</small> */}
+                <p>{item?.name}</p>
+                {item?.icon && <Image
                   className="daily-forecast-icon"
-                  src={icon}
+                  src={item?.icon}
                   alt={item?.shortForecast}
                   width={90}
                   height={90}
