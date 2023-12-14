@@ -132,6 +132,7 @@ export default function Home() {
             const dayOfWeek = dateObj && `${constants.days[dateObj.getDay(dateObj)]}`;
             const dayOfMonth = dateObj && `${dateObj.getDate(dateObj)}`;
             const ordinal = dateObj && `${toOrdinalSuffix(dayOfMonth)}`;
+            
             return (
               <div key={item.number} className="daily-forecast-item">
                 {/* {dayOfWeek} {dayOfMonth}<small>{ordinal}</small> */}
