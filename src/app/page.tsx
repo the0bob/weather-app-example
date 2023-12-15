@@ -135,7 +135,7 @@ export default function Home() {
             
             return (
               <div key={item.number} className="daily-forecast-item">
-                {/* {dayOfWeek} {dayOfMonth}<small>{ordinal}</small> */}
+                <p>{dayOfMonth}<small>{ordinal}</small></p>
                 <p>{item?.name}</p>
                 {item?.icon && <Image
                   className="daily-forecast-icon"
