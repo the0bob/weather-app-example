@@ -91,6 +91,9 @@ export default function Home() {
         <div className="control-wrapper">
           <input className="control" value={searchText} onChange={handleSearchInput} type="text" placeholder="Enter Zipcode, City, or State" />
         </div>
+        <div className="link-back">
+          <a href="https://bobpalmer.info/" target="_blank" rel="noreferrer">...back to bobpalmer.info</a>.
+        </div>
       </div>
       <div className={loading ? 'content' : 'hidden'}> 
         Loading...

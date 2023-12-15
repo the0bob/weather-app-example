@@ -47,6 +47,16 @@ body {
   width: 240px;
 }
 
+.link-back {
+  display: inline-block;
+  justify-content: right;
+  vertical-align: text-bottom;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 200;
+  padding: 36px 14px 0px;
+}
+
 .content {
   width: 100%;
   padding: 24px;
